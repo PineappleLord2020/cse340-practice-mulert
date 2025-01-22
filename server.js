@@ -15,9 +15,10 @@ import express from 'express';
         const PORT = 3000;
 
         // Define important variables
+        const mode = process.env.MODE || 'production';
+
         const port = process.env.PORT || 3000;
 
-        const mode = process.env.MODE || 'production';
 
         // Place before all other calls to app
         app.set('view engine', 'ejs');
@@ -28,6 +29,11 @@ import express from 'express';
 
         // Serve static files from the public directory
         app.use(express.static(path.join(__dirname, 'public')));
+
+        app.use((req, res, next) => {
+            console.log(req);
+            next();
+        })
 
         // Place after your existing app.use(express.static(...)) call
         app.set('views', path.join(__dirname, 'views'));
@@ -42,14 +48,24 @@ import express from 'express';
         app.get('/about', (req, res) => {
             const title = 'About';
             const content = '<h1>About</h1>';
-            res.sendFile('index', { title, content, mode, port });
+            res.render('index', { title, content, mode, port });
         });
 
         app.get('/contact', (req, res) => {
-            const title = 'Contact';
-            const content = '<h1>Contact</h1>';
-            res.sendFile('index', { title, content, mode, port });
+            const title = 'Contact Page';
+            const content = '<h1>Welcome to the Contact page</h1>';
+            res.render('index', { title, content, mode, port });
         });
+
+        app.get('/explore/:name/:age/:id', (req, res) => {
+            const name = req.params.name;
+            const age = req.params.age;
+            const id = req.params.id;
+            const title = 'Contact Page';
+            const content = `
+            <h1 Hello! ${name}!`;
+            res.render('index', {port, mode, title, name, age, id, content});
+        })
 
         if (mode.includes('dev')) {
             const ws = await import('ws');
