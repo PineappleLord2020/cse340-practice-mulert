@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <% if (process.env.MODE?.toLowerCase().includes('dev')) { %>
+    <% if (mode.includes('dev')) { %>
         <script>
-            const ws = new WebSocket(`ws://${location.hostname}:${parseInt(process.env.PORT) + 1}`);
+            const ws = new WebSocket(`ws://${location.hostname}:${parseInt(<%= port %>) + 1}`);
             ws.onclose = () => {
                 setTimeout(() => location.reload(), 2000);
             };

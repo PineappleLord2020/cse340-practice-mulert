@@ -6,15 +6,6 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (process.env.MODE?.toLowerCase().includes('dev')) {
-    const WebSocket = require('ws');
-    const wsPort = parseInt(process.env.PORT, 10) + 1;
-    const wsServer = new WebSocket.Server({ port: wsPort });
-    wsServer.on('connection', (socket) => {
-        console.log('WebSocket connected');
-    });
-}
-
 import express from 'express';
 
         const app = express();
@@ -22,6 +13,11 @@ import express from 'express';
         const name = process.env.NAME; // <-- NEW
 
         const PORT = 3000;
+
+        // Define important variables
+        const port = process.env.PORT || 3000;
+
+        const mode = process.env.MODE || 'production';
 
         // Place before all other calls to app
         app.set('view engine', 'ejs');
@@ -40,19 +36,35 @@ import express from 'express';
         app.get('/', (req, res) => {
             const title = 'Home Page';
             const content = '<h1>Welcome to the Home Page</h1>';
-            res.render('index', { title, content });
+            res.render('index', { title, content, mode, port });
         });
 
-        app.get('/', (req, res) => {
+        app.get('/about', (req, res) => {
             const title = 'About';
             const content = '<h1>About</h1>';
-            res.sendFile('index', { title, content });
+            res.sendFile('index', { title, content, mode, port });
         });
 
-        app.get('/', (req, res) => {
+        app.get('/contact', (req, res) => {
             const title = 'Contact';
             const content = '<h1>Contact</h1>';
-            res.sendFile('index', { title, content });
+            res.sendFile('index', { title, content, mode, port });
         });
+
+        if (mode.includes('dev')) {
+            const ws = await import('ws');
+            try {
+                const wsPort = parseInt(port) + 1;
+                const wsServer = new ws.WebSocketServer({ port: wsPort });
+                wsServer.on('listening', () => {
+                    console.log(`WebSocket server is running on port ${wsPort}`);
+                });
+                wsServer.on('error', (error) => {
+                    console.error('WebSocket server error:', error);
+                });
+            } catch (error) {
+                console.error('Failed to start WebSocket server:', error);
+            }
+        }
 
         
