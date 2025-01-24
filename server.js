@@ -65,7 +65,7 @@ import express from 'express';
             const content = `
             <h1 Hello! ${name}!`;
             res.render('index', {port, mode, title, name, age, id, content});
-        })
+        });
 
         if (mode.includes('dev')) {
             const ws = await import('ws');
@@ -81,6 +81,20 @@ import express from 'express';
             } catch (error) {
                 console.error('Failed to start WebSocket server:', error);
             }
-        }
+        };
+
+    app.use((req, res) => {
+        const title = 'Page Not Found';
+        res.status(404);
+        res.render('404', {title, mode, port});
+    });
+
+    app.use((err, req, res, next) => {
+        const title = 'Page Not Fount';
+        const error = err.message;
+        res.status(500);
+        res.render('500', {title, mode, port, error});
+
+    });
 
         
