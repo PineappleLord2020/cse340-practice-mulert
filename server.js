@@ -30,6 +30,12 @@ import express from 'express';
         // Serve static files from the public directory
         app.use(express.static(path.join(__dirname, 'public')));
 
+
+        app.use((req, res, next) => {
+            req.timestamp = new Date().toISOString();
+            next();
+        })
+
         app.use((req, res, next) => {
             console.log(req);
             next();
@@ -40,8 +46,10 @@ import express from 'express';
 
         // Example of the home route using the layout
         app.get('/', (req, res) => {
+            const timestamp = req.timestamp;
             const title = 'Home Page';
-            const content = '<h1>Welcome to the Home Page</h1>';
+            const content = '<h1>Welcome to the Home Page</h1>'
+            '<p>You requested this page at: ${timestamp}</p>';
             res.render('index', { title, content, mode, port });
         });
 
@@ -64,7 +72,16 @@ import express from 'express';
             const title = 'Contact Page';
             const content = `
             <h1 Hello! ${name}!`;
+            console.log(req.params); // Log only the route parameters
+            res.send('Check your computers console for the details!');
             res.render('index', {port, mode, title, name, age, id, content});
+        });
+
+        app.get('/account/:name/:id', (req, res) => {
+            const title = "Account Page";
+            const { name, id } = req.params;
+            const content = `<h1>Welcome, ${name}!</h1><p>Your account ID is ${id}.</p>`;
+            res.render('index', { title, content, mode, port });
         });
 
         if (mode.includes('dev')) {
