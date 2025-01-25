@@ -34,12 +34,17 @@ import express from 'express';
         app.use((req, res, next) => {
             req.timestamp = new Date().toISOString();
             next();
-        })
+        });
 
         app.use((req, res, next) => {
             console.log(req);
             next();
         })
+
+        app.use((req, res, next) => {
+            res.setHeader('X-Powered-By', 'Express Middleware Tutorial');
+            next();
+        });
 
         // Place after your existing app.use(express.static(...)) call
         app.set('views', path.join(__dirname, 'views'));
@@ -48,8 +53,8 @@ import express from 'express';
         app.get('/', (req, res) => {
             const timestamp = req.timestamp;
             const title = 'Home Page';
-            const content = '<h1>Welcome to the Home Page</h1>'
-            '<p>You requested this page at: ${timestamp}</p>';
+            const content = `<h1>Welcome to the Home Page</h1>
+            <p>You requested this page at: ${timestamp}</p>`;
             res.render('index', { title, content, mode, port });
         });
 
@@ -77,12 +82,36 @@ import express from 'express';
             res.render('index', {port, mode, title, name, age, id, content});
         });
 
-        app.get('/account/:name/:id', (req, res) => {
-            const title = "Account Page";
-            const { name, id } = req.params;
-            const content = `<h1>Welcome, ${name}!</h1><p>Your account ID is ${id}.</p>`;
-            res.render('index', { title, content, mode, port });
-        });
+        // ID validation middleware
+const validateId = (req, res, next) => {
+    const { id } = req.params;
+    if (isNaN(id)) {
+        return res.status(400).send('Invalid ID: must be a number.');
+    }
+    next(); // Pass control to the next middleware or route
+};
+ 
+const validateName = (req, res, next) => {
+    const { name } = req.params;
+    if (!/^[a-zA-Z]+$/.test(name)) {
+        return res.status(400).send('Invalid name: must only contain letters.');
+    }
+    next();
+};
+ 
+// Account page route with ID and name validation
+app.get('/account/:name/:id', validateId, validateName, (req, res) => {
+    const title = "Account Page";
+    const timestamp = req.timestamp;
+    const { name, id } = req.params;
+    const isEven = id % 2 === 0 ? "even" : "odd";
+    const content = `
+        <h1>Welcome, ${name}!</h1>
+        <p>Your account ID is ${id}, which is an ${isEven} number.</p>
+        <p>Last updated: ${timestamp}</p>
+    `;
+    res.render('index', { title, content, mode, port });
+});
 
         if (mode.includes('dev')) {
             const ws = await import('ws');
@@ -100,18 +129,27 @@ import express from 'express';
             }
         };
 
-    app.use((req, res) => {
-        const title = 'Page Not Found';
-        res.status(404);
-        res.render('404', {title, mode, port});
-    });
 
-    app.use((err, req, res, next) => {
-        const title = 'Page Not Fount';
-        const error = err.message;
-        res.status(500);
-        res.render('500', {title, mode, port, error});
-
-    });
+        
+        app.use((req, res, next) => {
+            const error = new Error('Page Not Found');
+            error.status = 404;
+            next(error);
+        });
+         
+        // Centralized error handler
+        app.use((err, req, res, next) => {
+            const status = err.status || 500;
+            const context = { mode, port };
+            res.status(status);
+            if (status === 404) {
+                context.title = 'Page Not Found';
+                res.render('404', context);
+            } else {
+                context.title = 'Internal Server Error';
+                context.error = err.message;
+                res.render('500', context);
+            }
+        });
 
         
