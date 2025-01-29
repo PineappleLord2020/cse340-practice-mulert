@@ -31,8 +31,23 @@ import express from 'express';
         app.use(express.static(path.join(__dirname, 'public')));
 
 
+        // Global middleware for dev vs prod
         app.use((req, res, next) => {
-            req.timestamp = new Date().toISOString();
+            req.devModeEnabled = mode.includes('dev'); // New helper property to check if in dev mode
+            res.locals.devModeWarning = ''; // Placeholder for a dev mode warning
+            res.locals.scripts = []; // Placeholder for front-end scripts
+ 
+            if (req.devModeEnabled){
+                res.locals.scripts.push(`
+                  <script>
+            const ws = new WebSocket('ws://${location.hostname}:${parseInt(<%= port %>) + 1}');
+            ws.onclose = () => {
+                setTimeout(() => location.reload(), 2000);
+            };
+        </script>`);
+            res.locals.devModeWarning.push('<p>Warning! You have entered Developer Mode</p>');
+            }
+            res.locals.scripts.push()
             next();
         });
 
@@ -51,23 +66,22 @@ import express from 'express';
 
         // Example of the home route using the layout
         app.get('/', (req, res) => {
-            const timestamp = req.timestamp;
             const title = 'Home Page';
             const content = `<h1>Welcome to the Home Page</h1>
-            <p>You requested this page at: ${timestamp}</p>`;
-            res.render('index', { title, content, mode, port });
+            <p>You requested this page at: NEVER</p>`;
+            res.render('index', { title, content });
         });
 
         app.get('/about', (req, res) => {
             const title = 'About';
             const content = '<h1>About</h1>';
-            res.render('index', { title, content, mode, port });
+            res.render('index', { title, content });
         });
 
         app.get('/contact', (req, res) => {
             const title = 'Contact Page';
             const content = '<h1>Welcome to the Contact page</h1>';
-            res.render('index', { title, content, mode, port });
+            res.render('index', { title, content });
         });
 
         app.get('/explore/:name/:age/:id', (req, res) => {
@@ -79,7 +93,7 @@ import express from 'express';
             <h1 Hello! ${name}!`;
             console.log(req.params); // Log only the route parameters
             res.send('Check your computers console for the details!');
-            res.render('index', {port, mode, title, name, age, id, content});
+            res.render('index', { title, name, age, id, content});
         });
 
         // ID validation middleware
@@ -102,15 +116,14 @@ const validateName = (req, res, next) => {
 // Account page route with ID and name validation
 app.get('/account/:name/:id', validateId, validateName, (req, res) => {
     const title = "Account Page";
-    const timestamp = req.timestamp;
     const { name, id } = req.params;
     const isEven = id % 2 === 0 ? "even" : "odd";
     const content = `
         <h1>Welcome, ${name}!</h1>
         <p>Your account ID is ${id}, which is an ${isEven} number.</p>
-        <p>Last updated: ${timestamp}</p>
+        <p>Last updated: NEVER</p>
     `;
-    res.render('index', { title, content, mode, port });
+    res.render('index', { title, content });
 });
 
         if (mode.includes('dev')) {
