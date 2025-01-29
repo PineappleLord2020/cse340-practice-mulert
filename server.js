@@ -1,168 +1,40 @@
-// Add these imports to your existing imports
-import { fileURLToPath } from 'url';
+// Import required modules using ESM import syntax
+import express from 'express';
 import path from 'path';
-
-// Create __dirname and __filename variables
+import { fileURLToPath } from 'url';
+ 
+// Import all other required modules: Route handlers, Middleware, etc.
+import autoApplyLayout from './src/middleware/layouts.js';
+import homeRoute from './src/routes/home.js';
+ 
+// Get the current file path and directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-import express from 'express';
-
-        const app = express();
-
-        const name = process.env.NAME; // <-- NEW
-
-        const PORT = 3000;
-
-        // Define important variables
-        const mode = process.env.MODE || 'production';
-
-        const port = process.env.PORT || 3000;
-
-
-        // Place before all other calls to app
-        app.set('view engine', 'ejs');
-
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
-
-        // Serve static files from the public directory
-        app.use(express.static(path.join(__dirname, 'public')));
-
-
-        // Global middleware for dev vs prod
-        app.use((req, res, next) => {
-            req.devModeEnabled = mode.includes('dev'); // New helper property to check if in dev mode
-            res.locals.devModeWarning = ''; // Placeholder for a dev mode warning
-            res.locals.scripts = []; // Placeholder for front-end scripts
  
-            if (req.devModeEnabled){
-                res.locals.scripts.push(`
-                  <script>
-            const ws = new WebSocket('ws://${location.hostname}:${parseInt(<%= port %>) + 1}');
-            ws.onclose = () => {
-                setTimeout(() => location.reload(), 2000);
-            };
-        </script>`);
-            res.locals.devModeWarning.push('<p>Warning! You have entered Developer Mode</p>');
-            }
-            res.locals.scripts.push()
-            next();
-        });
-
-        app.use((req, res, next) => {
-            console.log(req);
-            next();
-        })
-
-        app.use((req, res, next) => {
-            res.setHeader('X-Powered-By', 'Express Middleware Tutorial');
-            next();
-        });
-
-        // Place after your existing app.use(express.static(...)) call
-        app.set('views', path.join(__dirname, 'views'));
-
-        // Example of the home route using the layout
-        app.get('/', (req, res) => {
-            const title = 'Home Page';
-            const content = `<h1>Welcome to the Home Page</h1>
-            <p>You requested this page at: NEVER</p>`;
-            res.render('index', { title, content });
-        });
-
-        app.get('/about', (req, res) => {
-            const title = 'About';
-            const content = '<h1>About</h1>';
-            res.render('index', { title, content });
-        });
-
-        app.get('/contact', (req, res) => {
-            const title = 'Contact Page';
-            const content = '<h1>Welcome to the Contact page</h1>';
-            res.render('index', { title, content });
-        });
-
-        app.get('/explore/:name/:age/:id', (req, res) => {
-            const name = req.params.name;
-            const age = req.params.age;
-            const id = req.params.id;
-            const title = 'Contact Page';
-            const content = `
-            <h1 Hello! ${name}!`;
-            console.log(req.params); // Log only the route parameters
-            res.send('Check your computers console for the details!');
-            res.render('index', { title, name, age, id, content});
-        });
-
-        // ID validation middleware
-const validateId = (req, res, next) => {
-    const { id } = req.params;
-    if (isNaN(id)) {
-        return res.status(400).send('Invalid ID: must be a number.');
-    }
-    next(); // Pass control to the next middleware or route
-};
+// Create an instance of an Express application
+const app = express();
  
-const validateName = (req, res, next) => {
-    const { name } = req.params;
-    if (!/^[a-zA-Z]+$/.test(name)) {
-        return res.status(400).send('Invalid name: must only contain letters.');
-    }
-    next();
-};
+// Set EJS as the view engine and the views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
  
-// Account page route with ID and name validation
-app.get('/account/:name/:id', validateId, validateName, (req, res) => {
-    const title = "Account Page";
-    const { name, id } = req.params;
-    const isEven = id % 2 === 0 ? "even" : "odd";
-    const content = `
-        <h1>Welcome, ${name}!</h1>
-        <p>Your account ID is ${id}, which is an ${isEven} number.</p>
-        <p>Last updated: NEVER</p>
-    `;
-    res.render('index', { title, content });
+// Serve static files from the public directory
+//app.use(express.static('public'));
+app.use('/css', express.static('public/css'));
+app.use('/js', express.static('public/js'));
+app.use('/images', express.static('public/images'));
+ 
+// Apply the layout middleware to automatically wrap views in a layout
+app.use(autoApplyLayout({
+    layoutDir: path.join(__dirname, 'src/views/layouts'),
+    defaultLayout: 'default'
+}));
+ 
+// Use the home route for the root URL
+app.use('/', homeRoute);
+ 
+// Start the server on the specified port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
-
-        if (mode.includes('dev')) {
-            const ws = await import('ws');
-            try {
-                const wsPort = parseInt(port) + 1;
-                const wsServer = new ws.WebSocketServer({ port: wsPort });
-                wsServer.on('listening', () => {
-                    console.log(`WebSocket server is running on port ${wsPort}`);
-                });
-                wsServer.on('error', (error) => {
-                    console.error('WebSocket server error:', error);
-                });
-            } catch (error) {
-                console.error('Failed to start WebSocket server:', error);
-            }
-        };
-
-
-        
-        app.use((req, res, next) => {
-            const error = new Error('Page Not Found');
-            error.status = 404;
-            next(error);
-        });
-         
-        // Centralized error handler
-        app.use((err, req, res, next) => {
-            const status = err.status || 500;
-            const context = { mode, port };
-            res.status(status);
-            if (status === 404) {
-                context.title = 'Page Not Found';
-                res.render('404', context);
-            } else {
-                context.title = 'Internal Server Error';
-                context.error = err.message;
-                res.render('500', context);
-            }
-        });
-
-        
