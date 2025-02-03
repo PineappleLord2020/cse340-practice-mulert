@@ -1,1 +1,6 @@
 <p>&copy; 2025 My App</p>
+<% if (locals.scripts && locals.scripts.length > 0) { %>
+    <% locals.scripts.forEach(script => { %>
+        <script src="<%= script %>"></script>
+    <% }); %>
+<% } %>

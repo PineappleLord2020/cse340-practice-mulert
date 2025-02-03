@@ -1,5 +1,4 @@
 {
-    "watch": ["*.js", "*.css"],
-    "ext": "js css",
+    "ext": "js css ejs",
     "exec": "node --env-file=.env server.js"
 }

@@ -2,12 +2,16 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import {getNavigationLinks} from './src/models/index.js';
+getNavigationLinks();
  
 // Import all other required modules: Route handlers, Middleware, etc.
 import baseRoute from './src/routes/index.js';
 import layouts from './src/middleware/layouts.js';
 import staticPaths from './src/middleware/static-paths.js';
 import { notFoundHandler, globalErrorHandler } from './src/middleware/error-handler.js';
+import {styles, scripts} from './src/middleware/dynamic.js';
  
 // Get the current file path and directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +21,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Serve static files from the public directory
-app.use(staticPaths);
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
  
 // Set EJS as the view engine and record the location of the views directory
 app.set('view engine', 'ejs');
@@ -34,6 +40,9 @@ app.use('/', baseRoute);
 // Apply error handlers
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
+
+app.use(styles);
+app.use(scripts);
  
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
