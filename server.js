@@ -11,7 +11,7 @@ import baseRoute from './src/routes/index.js';
 import layouts from './src/middleware/layouts.js';
 import staticPaths from './src/middleware/static-paths.js';
 import { notFoundHandler, globalErrorHandler } from './src/middleware/error-handler.js';
-import {styles, scripts} from './src/middleware/dynamic.js';
+import {styles, scripts} from './src/middleware/config-mode.js';
  
 // Get the current file path and directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -43,7 +43,26 @@ app.use(globalErrorHandler);
 
 app.use(styles);
 app.use(scripts);
+
+if (mode.includes('dev')) {
+    const ws = await import('ws');
  
+    try {
+        const wsPort = parseInt(port) + 1;
+        const wsServer = new ws.WebSocketServer({ port: wsPort });
+ 
+        wsServer.on('listening', () => {
+            console.log(`WebSocket server is running on port ${wsPort}`);
+        });
+ 
+        wsServer.on('error', (error) => {
+            console.error('WebSocket server error:', error);
+        });
+    } catch (error) {
+        console.error('Failed to start WebSocket server:', error);
+    }
+}
+
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
