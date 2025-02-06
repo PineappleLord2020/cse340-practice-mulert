@@ -1,5 +1,5 @@
 import { getNavigationLinks } from '../models/index.js';
-
+ 
 const getNav = async () => {
     const links = await getNavigationLinks();
     let nav = '<nav><ul>';
@@ -8,5 +8,5 @@ const getNav = async () => {
     });
     return `${nav}</ul></nav>`;
 };
-
+ 
 export { getNav };

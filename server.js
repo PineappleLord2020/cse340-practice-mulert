@@ -11,11 +11,13 @@ import baseRoute from './src/routes/index.js';
 import layouts from './src/middleware/layouts.js';
 import staticPaths from './src/middleware/static-paths.js';
 import { notFoundHandler, globalErrorHandler } from './src/middleware/error-handler.js';
-import {styles, scripts} from './src/middleware/config-mode.js';
+import configNodeEnv from './src/middleware/node-env.js';
  
 // Get the current file path and directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const mode = process.env.MODE || 'production';
+const port = process.env.PORT || 3000;
  
 // Create an instance of an Express application
 const app = express();
@@ -24,6 +26,7 @@ const app = express();
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use(configNodeEnv);
  
 // Set EJS as the view engine and record the location of the views directory
 app.set('view engine', 'ejs');
@@ -41,8 +44,8 @@ app.use('/', baseRoute);
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
-app.use(styles);
-app.use(scripts);
+//app.use(styles);
+//app.use(scripts);
 
 if (mode.includes('dev')) {
     const ws = await import('ws');
@@ -64,7 +67,6 @@ if (mode.includes('dev')) {
 }
 
 // Start the server on the specified port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://127.0.0.1:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server running on http://127.0.0.1:${port}`);
 });
