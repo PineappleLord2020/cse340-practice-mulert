@@ -54,6 +54,7 @@ export const notFoundHandler = (req, res, next) => {
  */
 export const globalErrorHandler = (err, req, res, next) => {
     // Ensure we are in an error state
+    res.locals.navHTML = '';
     if (!res.locals.isInErrorState) {
         res.locals.isInErrorState = true;
         res.locals.errorRenderCount = 0;

@@ -1,9 +1,14 @@
+import { getNav } from '../utilities/index.js';
+
 const port = process.env.PORT || 3000;
 const mode = process.env.MODE || 'production';
-
+ 
 const configureNodeEnvironment = async (req, res, next) => {
     res.locals.devModeWarning = '';
     res.locals.isDevMode = mode.includes('dev');
+    res.locals.navHTML = await getNav();
+    console.log(res.locals.navHTML);
+    res.locals.port = port;
     res.locals.scripts = [];
     res.locals.styles = [];
 

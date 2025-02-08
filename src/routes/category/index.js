@@ -1,18 +1,12 @@
 import { Router } from 'express';
-import { getNav } from '../utils/index.js';
+import { getGamesByClassification } from '../../models/index.js';
  
 const router = Router();
  
-// The home page route
-router.get('/', async (req, res) => {
-    const nav = "await getNav();"
-    res.render('index', { title: 'Home Page', nav });
-});
- 
-// About page route
-router.get('/about', async (req, res) => {
-    const nav = "await getNav();"
-    res.render('about', { title: 'About Page', nav });
+// Game category route
+router.get('/:id', async (req, res) => {
+    const games = await getGamesByClassification(req.params.id);
+    res.render('category/index', { title: 'Games', games });
 });
  
 export default router;
