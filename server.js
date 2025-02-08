@@ -10,6 +10,7 @@ import staticPaths from './src/middleware/static-paths.js';
 import { notFoundHandler, globalErrorHandler } from './src/middleware/error-handler.js';
 import configNodeEnv from './src/middleware/node-env.js';
 import categoryRoute from './src/routes/category/index.js';
+import { setupDatabase } from './src/database/index.js';
  
 // Handle all request for a category of games
 
@@ -66,6 +67,7 @@ if (mode.includes('dev')) {
 }
 
 // Start the server on the specified port
-app.listen(port, () => {
+app.listen(port, async () => { 
+    await setupDatabase();
     console.log(`Server running on http://127.0.0.1:${port}`);
 });

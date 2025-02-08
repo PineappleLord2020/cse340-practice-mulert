@@ -7,7 +7,6 @@ const configureNodeEnvironment = async (req, res, next) => {
     res.locals.devModeWarning = '';
     res.locals.isDevMode = mode.includes('dev');
     res.locals.navHTML = await getNav();
-    console.log(res.locals.navHTML);
     res.locals.port = port;
     res.locals.scripts = [];
     res.locals.styles = [];
