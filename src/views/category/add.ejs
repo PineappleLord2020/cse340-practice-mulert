@@ -14,9 +14,14 @@
         <select id="classification_id" name="classification_id" required>
             <option value="" disabled selected>Select Classification</option>
             <% classifications.forEach((classification) => { %>
-            <option value="<%= classification.classification_id %>"><%= classification.classification_name %></option>
+                <option value="<%= classification.classification_id %>"><%= classification.classification_name %></option>
             <% }); %>
         </select>
+    </div>
+
+    <div>
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image">
     </div>
  
     <button type="submit">Add Game</button>

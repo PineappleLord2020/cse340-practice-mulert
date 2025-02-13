@@ -54,7 +54,7 @@ export const notFoundHandler = (req, res, next) => {
  */
 export const globalErrorHandler = (err, req, res, next) => {
     // Ensure we are in an error state
-    res.locals.navHTML = '';
+    
     if (!res.locals.isInErrorState) {
         res.locals.isInErrorState = true;
         res.locals.errorRenderCount = 0;
@@ -91,7 +91,8 @@ export const globalErrorHandler = (err, req, res, next) => {
     const context = {
         title: err.title || 'Error',
         error: err.message,
-        status
+        status,
+        ...res.locals
     };
 
     // Determine the correct error view file

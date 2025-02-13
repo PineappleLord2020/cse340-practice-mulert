@@ -24,6 +24,7 @@ const configureNodeEnvironment = async (req, res, next) => {
                 };
             </script>    
         `);
+        res.locals.scripts.push('<script src="/js/dev-mode.js"></script');
     }
 
     next();
