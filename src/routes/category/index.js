@@ -65,5 +65,36 @@ router.post('/add', async (req, res) => {
     await addNewGame(game_name, game_description, classification_id, image_path);
     res.redirect(`/category/view/${classification_id}`);
 });
+
+// Edit game route
+router.get('/edit/:id', async (req, res) => {
+    const classifications = await getClassifications();
+    const game = await getGameById(req.params.id);
+    res.render('category/edit', { title: 'Edit Game', classifications, game });
+});
+
+// Edit route to accept updated game information
+router.post('/edit/:id', async (req, res) => {
+    // Get existing game data to handle image replacement
+    const oldGameData = await getGameById(req.params.id);
+ 
+    // Extract form data and process any uploaded image
+    const { game_name, game_description, classification_id } = req.body;
+    const image_path = getVerifiedGameImage(req.files?.image);
+ 
+    // Update game details in database
+    await updateGame(req.params.id, game_name, game_description, classification_id, image_path);
+ 
+    // Clean up old image file if a new one was uploaded
+    if (image_path && image_path !== oldGameData.image_path) {
+        const oldImagePath = path.join(process.cwd(), `public${oldGameData.image_path}`);
+        if (fs.existsSync(oldImagePath) && fs.lstatSync(oldImagePath).isFile()) {
+            fs.unlinkSync(oldImagePath);
+        }
+    }
+ 
+    // Return to game category view page
+    res.redirect(`/category/view/${classification_id}`);
+});
  
 export default router;
