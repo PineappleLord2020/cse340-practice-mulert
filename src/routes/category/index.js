@@ -96,5 +96,11 @@ router.post('/edit/:id', async (req, res) => {
     // Return to game category view page
     res.redirect(`/category/view/${classification_id}`);
 });
+
+router.post('/delete', async (req, res) => {
+    const classifications = await getClassifications();
+    console.log(req.body)
+    res.redirect('/category/delete');
+})
  
 export default router;

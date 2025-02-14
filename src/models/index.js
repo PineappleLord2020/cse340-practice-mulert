@@ -62,5 +62,15 @@ async function updateGame(gameId, name, description, classificationId, imagePath
     `;
     return await db.run(sql, [name, description, classificationId, imagePath, gameId]);
 }
+
+async function deleteGame(gameId) {
+    const db = await dbPromise;
  
-export { getClassifications, getGamesByClassification, addNewGame, getGameById, updateGame };
+    const sql = `
+        DELETE game 
+            WHERE game_id = ?
+        `;
+        return await db.run(sql, [gameId]);
+}
+ 
+export { getClassifications, getGamesByClassification, addNewGame, getGameById, updateGame, deleteGame };

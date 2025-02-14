@@ -5,6 +5,9 @@
             <h3><%= game.game_name %></h3>
             <p><%= game.game_description %></p>
             <a href="/category/edit/<%= game.game_id %>">Edit</a>
+            <form>
+                <button href="/category/delete/<%= game.game_id %>">Delete</button>
+            </form>
         </div>
     <% }); %>
 </div>
