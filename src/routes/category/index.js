@@ -99,8 +99,14 @@ router.post('/edit/:id', async (req, res) => {
 
 router.post('/delete', async (req, res) => {
     const classifications = await getClassifications();
-    console.log(req.body)
-    res.redirect('/category/delete');
+    console.log(req.body);
+    res.redirect('/category/delete', classifications);
+})
+
+router.post('/addCategory', async (req, res) => {
+    const classifications = await getClassifications();
+    console.log(req.body);
+    res.redirect('/category/addCategory', classifications);
 })
  
 export default router;

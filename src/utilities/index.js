@@ -8,7 +8,7 @@ const getNav = async () => {
         const name = row.classification_name;
         nav += `<li><a href="/category/view/${id}">${name}</a></li>`
     });
-    return `${nav}<li><a href="/">Home</a></li><li><a href="/About">About</a></li><li><a href="/category/add">Add Game</a></li></ul></nav>`;
+    return `${nav}<li><a href="/">Home</a></li><li><a href="/About">About</a></li><li><a href="/category/add">Add Game</a></li><li><a href="/addCategory">Add Category</a></li></ul></nav>`;
 };
  
 export { getNav };

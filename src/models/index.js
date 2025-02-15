@@ -70,7 +70,7 @@ async function deleteGame(gameId) {
         DELETE game 
             WHERE game_id = ?
         `;
-        return await db.run(sql, [gameId]);
+    return await db.run(sql, [gameId]);
 }
  
 export { getClassifications, getGamesByClassification, addNewGame, getGameById, updateGame, deleteGame };

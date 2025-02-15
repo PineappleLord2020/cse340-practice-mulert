@@ -1,0 +1,26 @@
+<form action="/category/delete" method="POST">
+    <div>
+        <label for="game_name">Game Name:</label>
+        <input type="text" id="game_name" name="game_name" required>
+    </div>
+ 
+    <div>
+        <label for="action" required>Which Course of Action would you like to take?</label>
+        <select id="action" name="action">
+            <option value="delete">Delete</option>
+            <option value="move">Move</option>
+        </select>
+    </div>
+    
+    <div>
+        <label for="classification_id">Where would you like to move the game?</label>
+        <select id="classification_id" name="classification_id" required>
+            <option value="" disabled selected>Select Classification</option>
+            <% classifications.forEach((classification) => { %>
+                <option value="<%= classification.classification_id %>"><%= classification.classification_name %></option>
+            <% }); %>
+        </select>
+    </div>
+ 
+    <button type="submit">Remove Game</button>
+</form>
