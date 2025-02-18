@@ -1,26 +1,33 @@
-<form action="/category/delete" method="POST">
-    <div>
-        <label for="game_name">Game Name:</label>
-        <input type="text" id="game_name" name="game_name" required>
+<h1>Delete a Category</h1>
+ 
+<div class="category-table">
+    <div class="category-row header">
+        <div class="category-cell">Category Name</div>
+        <div class="category-cell">Move Games To</div>
+        <div class="category-cell">Delete</div>
     </div>
  
-    <div>
-        <label for="action" required>Which Course of Action would you like to take?</label>
-        <select id="action" name="action">
-            <option value="delete">Delete</option>
-            <option value="move">Move</option>
-        </select>
-    </div>
-    
-    <div>
-        <label for="classification_id">Where would you like to move the game?</label>
-        <select id="classification_id" name="classification_id" required>
-            <option value="" disabled selected>Select Classification</option>
-            <% classifications.forEach((classification) => { %>
-                <option value="<%= classification.classification_id %>"><%= classification.classification_name %></option>
-            <% }); %>
-        </select>
-    </div>
- 
-    <button type="submit">Remove Game</button>
-</form>
+    <% categories.forEach((category) => { %>
+        <form action="/category/delete/<%- category.category_id %>" method="POST">
+            <div class="category-row">
+                <div class="category-cell"><%= category.category_name %></div>
+                <div class="category-cell">
+                    <select name="new_category_id">
+                        <option value="">-- Choose an Option --</option>
+                        <option value="delete">Do Not Move, Delete Games</option>
+                        <% categories.forEach((otherCategory) => { %>
+                            <option value="<%= otherCategory.category_id %>">
+                                <%= otherCategory.category_name %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="category-cell">
+                    <button type="submit">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </form>
+    <% }); %>
+</div>

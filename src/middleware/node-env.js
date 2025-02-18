@@ -15,6 +15,8 @@ const configureNodeEnvironment = async (req, res, next) => {
         // Add development mode warning
         res.locals.devModeWarning = '<p class="dev-mode-msg">Site is in development mode<p>';
 
+        res.locals.styles.push('<link rel="stylesheet" href="/css/dev-mode.css">');
+        
         // Add livereload script
         res.locals.scripts.push(`
             <script>

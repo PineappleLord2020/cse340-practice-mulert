@@ -12,6 +12,7 @@ import configNodeEnv from './src/middleware/node-env.js';
 import categoryRoute from './src/routes/category/index.js';
 import { setupDatabase } from './src/database/index.js';
 import fileUploads from './src/middleware/file-upload.js';
+import gameRoute from './src/routes/game/index.js';
  
 // Handle all request for a category of games
 
@@ -46,6 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 // Use the home route for the root URL
 app.use('/', baseRoute);
 app.use('/category', categoryRoute);
+app.use('/game', gameRoute);
 
 // Apply error handlers
 app.use(notFoundHandler);
