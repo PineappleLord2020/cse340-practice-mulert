@@ -12,6 +12,7 @@ const getNav = async () => {
     ${nav}
         <li><a href="/">Home</a></li>
         <li><a href="/About">About</a></li>
+        <li><a href="/game/add">Add Game</a></li>
         <li><a href="/category/add">Add Category</a></li>
         <li><a href="/category/delete">Delete Category</a></li>
         </ul>
