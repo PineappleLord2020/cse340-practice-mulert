@@ -13,6 +13,7 @@ import categoryRoute from './src/routes/category/index.js';
 import { setupDatabase } from './src/database/index.js';
 import fileUploads from './src/middleware/file-upload.js';
 import gameRoute from './src/routes/game/index.js';
+import accountRoute from './src/routes/account/index.js';
  
 // Handle all request for a category of games
 
@@ -32,6 +33,23 @@ app.use(configNodeEnv);
 // Set EJS as the view engine and record the location of the views directory
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
+
+// Configure session middleware
+app.use(session({
+    store: new SQLiteSessionStore({
+        db: "db.sqlite",           // SQLite database file
+        dir: "./src/database/",    // Directory where the file is stored
+        concurrentDB: true         // Allows multiple processes to use the database
+    }),
+    secret: process.env.SESSION_SECRET || "default-secret",
+    resave: false,                 // Prevents re-saving sessions that have not changed
+    saveUninitialized: true,       // Saves new sessions even if unmodified
+    name: "sessionId",
+    cookie: {
+        secure: false,             // Set to `true` in production with HTTPS
+        httpOnly: true,            // Prevents client-side access to the cookie
+    }
+}));
  
 // Set Layouts middleware to automatically wrap views in a layout and configure default layout
 app.set('layout default', 'default');
@@ -48,6 +66,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', baseRoute);
 app.use('/category', categoryRoute);
 app.use('/game', gameRoute);
+app.use('/account', accountRoute);
 
 // Apply error handlers
 app.use(notFoundHandler);
