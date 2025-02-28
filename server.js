@@ -14,6 +14,10 @@ import { setupDatabase } from './src/database/index.js';
 import fileUploads from './src/middleware/file-upload.js';
 import gameRoute from './src/routes/game/index.js';
 import accountRoute from './src/routes/account/index.js';
+import session from 'express-session';
+import sqlite from "connect-sqlite3";
+import flash from "./src/middleware/flash-messages.js";
+
  
 // Handle all request for a category of games
 
@@ -22,6 +26,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const mode = process.env.MODE || 'production';
 const port = process.env.PORT || 3000;
+const sqliteSessionStore = sqlite(session);
  
 // Create an instance of an Express application
 const app = express();
@@ -36,7 +41,7 @@ app.set('views', path.join(__dirname, 'src/views'));
 
 // Configure session middleware
 app.use(session({
-    store: new SQLiteSessionStore({
+    store: new sqliteSessionStore({
         db: "db.sqlite",           // SQLite database file
         dir: "./src/database/",    // Directory where the file is stored
         concurrentDB: true         // Allows multiple processes to use the database
@@ -50,6 +55,8 @@ app.use(session({
         httpOnly: true,            // Prevents client-side access to the cookie
     }
 }));
+
+app.use(flash);
  
 // Set Layouts middleware to automatically wrap views in a layout and configure default layout
 app.set('layout default', 'default');

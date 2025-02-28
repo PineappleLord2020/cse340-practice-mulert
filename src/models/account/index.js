@@ -12,4 +12,4 @@ const verifyUser = async (email, password) => {
     return await db.get(sql, email, password);
 }
  
-export default { registerUser, verifyUser };
+export { registerUser, verifyUser };

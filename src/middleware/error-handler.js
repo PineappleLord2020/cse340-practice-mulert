@@ -91,6 +91,7 @@ export const globalErrorHandler = (err, req, res, next) => {
     const context = {
         title: err.title || 'Error',
         error: err.message,
+        stack: err.stack,
         status,
         ...res.locals
     };
