@@ -31,14 +31,6 @@ const sqliteSessionStore = sqlite(session);
 // Create an instance of an Express application
 const app = express();
 
-// Serve static files from the public directory
-staticPaths(app);
-app.use(configNodeEnv);
- 
-// Set EJS as the view engine and record the location of the views directory
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'src/views'));
-
 // Configure session middleware
 app.use(session({
     store: new sqliteSessionStore({
@@ -55,6 +47,15 @@ app.use(session({
         httpOnly: true,            // Prevents client-side access to the cookie
     }
 }));
+
+// Serve static files from the public directory
+staticPaths(app);
+app.use(configNodeEnv);
+ 
+// Set EJS as the view engine and record the location of the views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
+
 
 app.use(flash);
  
