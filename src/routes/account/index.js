@@ -73,7 +73,7 @@ router.get('login', async(req, res) => {
 router.post('/login', async(req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    const verify = await verifyUser;
+    const verify = await verifyUser(email, password);
 
     if (!email || !password || !confirmPW) {
         req.flash('error', 'One or more fields left blank. Please fill all fields.')
@@ -91,6 +91,8 @@ router.post('/login', async(req, res) => {
         req.flash('error', "Password isn't long enough.")
         return;
     }
+
+    verify(email, password);
 
 });
 
